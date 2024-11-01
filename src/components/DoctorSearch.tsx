@@ -3,10 +3,26 @@
 
 import { useState, useEffect } from 'react';
 
+// Define the types for doctor data and qualifications
+interface Qualification {
+  Degree: string;
+  Speciality?: string;
+  University: string;
+  PassingYear: string;
+}
+
+interface Doctor {
+  RegistrationNo: string;
+  Name: string;
+  FatherName: string;
+  Status: string;
+  qualifications?: Qualification[];
+}
+
 const DoctorSearch = () => {
   const [registrationNo, setRegistrationNo] = useState('');
   const [loading, setLoading] = useState(false);
-  const [doctor, setDoctor] = useState<any>(null);
+  const [doctor, setDoctor] = useState<Doctor | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -15,17 +31,17 @@ const DoctorSearch = () => {
 
   const handleSearch = async () => {
     setLoading(true);
-  
+
     try {
       const response = await fetch('/api/searchDoctor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ registrationNo }),
       });
-  
-      const data = await response.json();
+
+      const data: Doctor = await response.json();
       setDoctor(data);
-  
+
       // Clear the input field after displaying the result
       setRegistrationNo('');
     } catch (error) {
@@ -33,7 +49,7 @@ const DoctorSearch = () => {
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   return (
     <div className="max-w-screen-xl mx-auto p-8 bg-white rounded-lg shadow-md">
@@ -89,7 +105,7 @@ const DoctorSearch = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {doctor.qualifications.map((qualification: any, index: number) => (
+                  {doctor.qualifications.map((qualification, index) => (
                     <tr key={index} className="hover:bg-gray-100">
                       <td className="py-2 px-4 border border-gray-300 text-left">
                         {qualification.Degree} {qualification.Speciality}
